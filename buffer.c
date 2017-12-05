@@ -15,51 +15,57 @@
 
 void print_buff(Buffer *buff);
 
-void print_actual_time() ;
+void print_actual_time();
+
+void set_can_pop(const Buffer *buff);
 
 void buffer_init() {
     int shm_id = get_shared_memory(sizeof(Buffer));
-    init_semaphore(BUFF_MUTEX, 0);
-    init_semaphore(BUFF_EMPTY, 0);
-    init_semaphore(BUFF_FULL, BUFF_SIZE);
+    set_semaphore_val(SEM_BUFF_MUTEX, 0);
+    set_semaphore_val(SEM_BUFF_EMPTY, 0);
+    set_semaphore_val(SEM_BUFF_FULL, BUFF_SIZE);
+    set_semaphore_val(SEM_BUFF_CAN_POP, 0);
     Buffer *buff = (Buffer *) shmat(shm_id, NULL, 0);
     buff->size = 0;
 }
 
 void buffer_put(Buffer *buff, char value) {
-    semaphore_dec(BUFF_FULL);
+    semaphore_dec(SEM_BUFF_FULL);
 
-    semaphore_inc(BUFF_MUTEX);
-
+    semaphore_inc(SEM_BUFF_MUTEX);
     buff->data[buff->size] = value;
     ++buff->size;
-
     print_buff(buff);
+    set_can_pop(buff);
+    semaphore_dec(SEM_BUFF_MUTEX);
 
-    semaphore_dec(BUFF_MUTEX);
-
-    semaphore_inc(BUFF_EMPTY);
+    semaphore_inc(SEM_BUFF_EMPTY);
 }
 
 char buffer_pop(Buffer *buff) {
-    semaphore_dec(BUFF_EMPTY);
+    semaphore_dec(SEM_BUFF_EMPTY);
 
-    semaphore_inc(BUFF_MUTEX);
-
+    semaphore_dec(SEM_BUFF_CAN_POP);
+    semaphore_inc(SEM_BUFF_MUTEX);
     --buff->size;
     const char pop_val = buff->data[buff->size];
-
+    set_can_pop(buff);
     print_buff(buff);
+    semaphore_dec(SEM_BUFF_MUTEX);
 
-    semaphore_dec(BUFF_MUTEX);
-
-    semaphore_inc(BUFF_FULL);
+    semaphore_inc(SEM_BUFF_FULL);
     return pop_val;
 }
 
 Buffer *get_buff() {
     int shm_id = get_shared_memory(sizeof(Buffer));
-    Buffer *buf = (Buffer *) shmat(shm_id, NULL, 0);
+    return (Buffer *) shmat(shm_id, NULL, 0);
+}
+
+void set_can_pop(const Buffer *buff) {
+    if (buff->size > BUFF_MIN) {
+        set_semaphore_val(SEM_BUFF_CAN_POP, 1);
+    }
 }
 
 void print_buff(Buffer *buff) {
@@ -73,7 +79,7 @@ void print_buff(Buffer *buff) {
             fprintf(stdout, "%c", value);
         }
     }
-    fprintf(stdout, "]\n");
+    fprintf(stdout, "], size: %d\n", buff->size);
 }
 
 void print_actual_time() {
@@ -86,7 +92,7 @@ void print_actual_time() {
     strcat(buf, ".");
     sprintf(usec_buf, "%d", (int) tm_now.tv_usec);
     strcat(buf, usec_buf);
-    
+
     fprintf(stdout, "%s: ", buf);
 }
 

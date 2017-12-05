@@ -9,7 +9,7 @@ int main() {
     Buffer *const pBuffer = get_buff();
 
     while (1) {
-        sleep(3);
+        sleep(1);
         buffer_pop(pBuffer);
     }
 

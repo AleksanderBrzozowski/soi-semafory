@@ -7,22 +7,23 @@
 #ifndef SEMAFORY_SOI_SEMAPHORE_H
 #define SEMAFORY_SOI_SEMAPHORE_H
 
-#define SEM_KEY         451996
+#define SEM_KEY         451999
 #define SEM_PERMISSION  0600
 #define SEM_SIZE        12
 
-#define BUFF_FULL       0
-#define BUFF_EMPTY      1
-#define BUF2_FULL       2
-#define BUF2_EMPTY      3
-#define BUF1_A          4
-#define BUF1_B          5
-#define BUFF_MUTEX       6
+#define SEM_BUFF_FULL       0
+#define SEM_BUFF_EMPTY      1
+#define SEM_BUFF_CAN_POP    2
+#define SEM_BUFF_MUTEX      6
 
-int init_semaphore(unsigned int sem_num, unsigned int initial_value);
+int set_semaphore_val(unsigned int sem_num, unsigned int initial_value);
 
-void semaphore_inc(int sem_id);
+void semaphore_inc(int sem_num);
 
-void semaphore_dec(int semid);
+void semaphore_dec(int sem_num);
+
+void semaphore_dec_no_wait(int sem_num);
+
+void semaphore_zero_wait(int sem_num);
 
 #endif //SEMAFORY_SOI_SEMAPHORE_H

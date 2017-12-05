@@ -6,6 +6,9 @@
 #define SEMAFORY_SOI_BUFFER_H
 
 #define BUFF_SIZE 20
+#define BUFF_MIN  3
+
+
 typedef struct Buffer {
     char data[BUFF_SIZE];
     int size;
