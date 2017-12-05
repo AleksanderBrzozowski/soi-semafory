@@ -66,28 +66,3 @@ void semaphore_dec(int sem_num) {
     }
 }
 
-void semaphore_dec_no_wait(int sem_num) {
-    int sem_id = get_semaphore_set();
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wconversion"
-    buf.sem_num = sem_num;
-#pragma clang diagnostic pop
-    buf.sem_op = -1;
-    buf.sem_flg = IPC_NOWAIT;
-
-    semop(sem_id, &buf, 1);
-}
-
-void semaphore_zero_wait(int sem_num) {
-    int sem_id = get_semaphore_set();
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wconversion"
-    buf.sem_num = sem_num;
-#pragma clang diagnostic pop
-    buf.sem_op = 0;
-    buf.sem_flg = 0;
-    if (semop(sem_id, &buf, 1) == -1) {
-        fprintf(stderr, "Unable to zero wait semaphore with num: %d", sem_id);
-        exit(1);
-    }
-}

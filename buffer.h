@@ -5,13 +5,17 @@
 #ifndef SEMAFORY_SOI_BUFFER_H
 #define SEMAFORY_SOI_BUFFER_H
 
-#define BUFF_SIZE 20
-#define BUFF_MIN  3
+#define BUFF_SIZE  20
+#define BUFF_MIN   3
+#define MAX_PREV_A 2
+#define MAX_PREV_B 2
 
 
 typedef struct Buffer {
     char data[BUFF_SIZE];
     int size;
+    int prev_a_count;
+    int prev_b_count;
 } Buffer;
 
 void buffer_init();

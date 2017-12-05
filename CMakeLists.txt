@@ -7,4 +7,5 @@ set(SOURCE_FILES semaphore.c semaphore.h buffer.c buffer.h shared_memory.c share
 
 add_executable(init ${SOURCE_FILES} init.c)
 add_executable(producer_a ${SOURCE_FILES} producer_a.c)
+add_executable(producer_b ${SOURCE_FILES} producer_b.c)
 add_executable(consumer ${SOURCE_FILES} consumer.c)
